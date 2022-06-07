@@ -6,7 +6,8 @@ const app = express(); // initial
 
 // DB dan middleware
 connectDB();
-
-app.use(router);
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(router); // hrs di bawah
 
 module.exports = app;
