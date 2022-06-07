@@ -1,12 +1,13 @@
 const User = require('../models/User');
 
 class UserController {
-  static async register(req, res) {
+  static async register(req, res, next) {
     try {
       const newUser = await User.create({
         email: req.body.email,
         password: req.body.password,
         username: req.body.username,
+        gender: req.body.gender,
       });
 
       return res
@@ -17,11 +18,11 @@ class UserController {
           message: "Succesfully create user",
         });
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   }
 
-  static async findAllUsers(req, res) {
+  static async findAllUsers(req, res, next) {
     try {
       const users = await User.find({});
 
@@ -31,11 +32,11 @@ class UserController {
         message: "Succesfully find all users",
       });
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   }
 
-  static async findUserById(req, res) {
+  static async findUserById(req, res, next) {
     try {
       const user = await User.findById(req.params.id);
 
@@ -45,7 +46,7 @@ class UserController {
         message: "Succesfully find user by id",
       });
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   }
 }
