@@ -3,6 +3,10 @@ const { comparePassword } = require('../helper/hash');
 const { generateToken } = require('../helper/jwt');
 
 class UserController {
+  // setiap fungsi dari controller menerima 3 parameter
+  // req = adalah parameter dari request yang didapat dari frontend
+  // res = adalah parameter untuk response yang akan dikembalikan ke frontend atau consumer
+  // next = untuk lanjut ke proses selanjutnya, (utk kasus kita, diberikan ke middleware error handling)
   static async register(req, res, next) {
     try {
       const newUser = await User.create({
@@ -58,6 +62,14 @@ class UserController {
       const id = req.loggedUser.id;
       const data = await User.findById(id).exec();
 
+      // jika user tidak ada
+      if (data === null) {
+        throw {
+          status: 404,
+          message: "User Not Found",
+        }
+      }
+
       return res.status(200).json({
         data,
         status: "Success",
@@ -70,7 +82,14 @@ class UserController {
 
   static async findAllUsers(req, res, next) {
     try {
-      const users = await User.find({});
+      const users = await User.find({}).exec();
+
+      if (users === null) {
+        throw {
+          status: 404,
+          message: "User Not Found",
+        }
+      }
 
       return res.status(200).json({
         data: users,
@@ -84,13 +103,77 @@ class UserController {
 
   static async findUserById(req, res, next) {
     try {
-      const user = await User.findById(req.params.id);
+      // .exec() berfungsi utk mengeksekusi query
+      const user = await User.findById(req.params.id).exec();
+
+      // jika user tidak ada
+      if (user === null) {
+        throw {
+          status: 404,
+          message: "User Not Found",
+        }
+      }
 
       return res.status(200).json({
         data: user,
         status: "Success",
         message: "Succesfully find user by id",
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateUser(req, res, next) {
+    try {
+      const id = req.loggedUser.id;
+      const data = await User.findById(id).exec();
+
+      // jika user tidak ada
+      if (data === null) {
+        throw {
+          status: 404,
+          message: "User Not Found",
+        }
+      }
+
+      // update data
+      data["username"] = req.body.username ? req.body.username : data.username;
+      data["email"] = req.body.email ? req.body.email : data.email;
+      data["updated_at"] = new Date().toISOString();
+
+      const updatedData = await data.save();
+
+      return res.status(200).json({
+        data: updatedData,
+        status: "Success",
+        message: "Succesfully update user",
+      })
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteUser(req, res, next) {
+    try {
+      const id = req.loggedUser.id;
+      const data = await User.findById(id).exec();
+
+      // jika user tidak ada
+      if (data === null) {
+        throw {
+          status: 404,
+          message: "User Not Found",
+        }
+      }
+
+      const deletedUser = await data.remove();
+
+      return res.status(200).json({
+        data: deletedUser,
+        status: "Success",
+        message: "Succesfully delete user",
+      })
     } catch (error) {
       next(error);
     }
