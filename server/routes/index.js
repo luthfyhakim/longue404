@@ -14,6 +14,8 @@ router.route("/api/v1/login").post(UserController.login);
 
 // user
 router.route("/api/v1/users").get(userAuthentication, UserController.findAllUsers);
-router.route("/api/v1/users/:id").get(UserController.findUserById);
+router.route("/api/v1/users/:id").get(userAuthentication, UserController.findUserById);
+
+router.route("/api/v1/user").get(userAuthentication, UserController.findLoggedUser);
 
 module.exports = router;

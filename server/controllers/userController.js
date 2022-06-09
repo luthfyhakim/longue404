@@ -53,6 +53,21 @@ class UserController {
     }
   }
 
+  static async findLoggedUser(req, res, next) {
+    try {
+      const id = req.loggedUser.id;
+      const data = await User.findById(id).exec();
+
+      return res.status(200).json({
+        data,
+        status: "Success",
+        message: "Succesfully find logged user",
+      })
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async findAllUsers(req, res, next) {
     try {
       const users = await User.find({});
