@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const { comparePassword } = require('../helper/hash');
+const { generateToken } = require('../helper/jwt');
 
 class UserController {
   static async register(req, res, next) {
@@ -17,6 +19,35 @@ class UserController {
           status: "Success",
           message: "Succesfully create user",
         });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async login(req, res, next) {
+    try {
+      const foundUser = await User.findOne({ email: req.body.email }).exec();
+
+      if (foundUser && comparePassword(req.body.password, foundUser.password)) {
+        const payload = {
+          id: foundUser._id,
+          email: foundUser.email,
+          username: foundUser.username,
+        }
+
+        const access_token = generateToken(payload);
+
+        return res.status(200).json({
+          data: access_token,
+          status: "Success",
+          message: "Succesfully login",
+        })
+      }else {
+        throw {
+          status: 400,
+          message: "Invalid username or password",
+        }
+      }
     } catch (error) {
       next(error);
     }
