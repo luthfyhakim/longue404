@@ -1,17 +1,9 @@
-import React from "react";
 import {
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  FormHelperText,
-  Text,
-  Button,
-  Image,
-  Flex
+  Box, Button, Flex, FormControl,
+  FormLabel, Image, Input, Text
 } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
-import camp404Logo from '../assets/camp404_logo.png'
+import camp404Logo from '../assets/camp404_logo.png';
 
 const Login = () => {
   const history = useHistory();
