@@ -1,30 +1,21 @@
-import React from "react";
 import {
-  Box,
-  Grid,
-  GridItem,
-  Avatar,
-  Text,
-  Button,
-  AvatarBadge,
-  Flex,
-  Icon,
+  Avatar, Box, Button, Flex, Grid,
+  GridItem, Icon,
   Image,
   Input,
   InputGroup,
-  InputRightElement,
-  useDisclosure,
+  InputRightElement, Text, useDisclosure
 } from "@chakra-ui/react";
 
 // modals
 import ModalInfoUser from "../components/modalInfoUser";
 
 // icons
-import camp404Logo from "../assets/camp404_logo.png";
 import { FiEdit, FiUser } from "react-icons/fi";
 import { HiPaperAirplane } from "react-icons/hi";
-import ModalEditUser from "../components/modalEditUser";
+import camp404Logo from "../assets/camp404_logo.png";
 import ModalBrowseUsers from "../components/modalBrowseUsers";
+import ModalEditUser from "../components/modalEditUser";
 
 const ChatPage = () => {
   // state open & close untuk modal (lihat lebih lengkap di docs chakra ui)
@@ -60,8 +51,9 @@ const ChatPage = () => {
           bgColor="white"
           shadow={"md"}
           padding="4"
-          width={"50vw"}
+          width={{ base: "70vw", md: "60vw", xl: "50vw" }}
           height={"75vh"}
+          position="relative"
         >
           <Grid templateColumns="repeat(4, 1fr)" height={"100%"}>
             <GridItem
@@ -145,7 +137,7 @@ const ChatPage = () => {
                     </Text>
                     <Avatar name="saha we" size="xs" marginLeft={"2"} />
                   </Flex>
-                  <Text textAlign={"end"}>Engga adaaa :)</Text>
+                  <Text textAlign={"end"}>Engga adaaa :/</Text>
                 </Box>
               </Box>
               <InputGroup>

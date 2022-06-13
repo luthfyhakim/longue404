@@ -16,3 +16,17 @@ export const register = async (body) => {
   }
   return result;
 }
+
+export const login = async (body) => {
+  let result;
+  try {
+    const { data } = await axios.post(`${baseUrl}/api/v1/login`, {
+      email: body.email,
+      password: body.password,
+    })
+    result = data;
+  } catch (error) {
+    result = error.response;
+  }
+  return result;
+}
