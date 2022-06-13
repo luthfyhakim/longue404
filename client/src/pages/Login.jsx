@@ -32,6 +32,7 @@ const Login = () => {
 
     let response = await login(body);
     if (response.status === "Success") {
+      localStorage.setItem("access_token", response.data);
       toast({
         title: 'Welcome To Chat App.',
         status: 'success',
