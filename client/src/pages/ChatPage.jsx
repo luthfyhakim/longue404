@@ -8,8 +8,8 @@ import {
 } from "@chakra-ui/react";
 
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { userActions } from "../redux/action";
+import { useDispatch, useSelector } from "react-redux";
+import { usersActions } from "../redux/action";
 
 // modals
 import ModalInfoUser from "../components/modalInfoUser";
@@ -42,9 +42,11 @@ const ChatPage = () => {
   } = useDisclosure();
 
   const dispatch = useDispatch();
+  const loggedUser = useSelector((st) => st.loggedUser);
 
   useEffect(() => {
-    dispatch(userActions.getUsers());
+    dispatch(usersActions.getUsers());
+    dispatch(usersActions.getLoggedUser());
   }, []);
 
   return (
@@ -82,6 +84,7 @@ const ChatPage = () => {
                   name="YN"
                   bg="cyan.500"
                   color="white"
+                  src={loggedUser.avatar}
                 ></Avatar>
                 <Icon
                   onClick={onOpenEditUser}
@@ -92,7 +95,7 @@ const ChatPage = () => {
                   alignSelf="end"
                 />
               </Flex>
-              <Text marginTop="2">Your Name</Text>
+              <Text marginTop="2">{loggedUser.username}</Text>
               <Button
                 onClick={onOpenBrowseUsers}
                 bg="gray.50"
