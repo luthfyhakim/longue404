@@ -45,3 +45,37 @@ export const getLoggedUser = async () => {
 
   return result;
 }
+
+export const editUser = async (body) => {
+  let result;
+
+  try {
+    const { data } = await axios.put(
+      `${baseUrl}/api/v1/user`,
+      { ...body },
+      {
+        headers: { access_token: localStorage.access_token },
+      }
+    );
+    result = data;
+  } catch (error) {
+    result = error.response;
+  }
+
+  return result;
+}
+
+export const deleteUser = async () => {
+  let result;
+
+  try {
+    const { data } = await axios.delete(`${baseUrl}/api/v1/user`, {
+      headers: { access_token: localStorage.access_token },
+    });
+    result = data;
+  } catch (error) {
+    result = error.response;
+  }
+
+  return result;
+}

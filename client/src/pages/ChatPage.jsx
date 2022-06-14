@@ -4,11 +4,12 @@ import {
   Image,
   Input,
   InputGroup,
-  InputRightElement, Text, useDisclosure
+  InputRightElement, Text, useDisclosure, useToast
 } from "@chakra-ui/react";
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { usersActions } from "../redux/action";
 
 // modals
@@ -17,6 +18,7 @@ import ModalInfoUser from "../components/modalInfoUser";
 // icons
 import { FiEdit, FiUser } from "react-icons/fi";
 import { HiPaperAirplane } from "react-icons/hi";
+import { IoExitOutline } from "react-icons/io5";
 import camp404Logo from "../assets/camp404_logo.png";
 import ModalBrowseUsers from "../components/modalBrowseUsers";
 import ModalEditUser from "../components/modalEditUser";
@@ -42,12 +44,26 @@ const ChatPage = () => {
   } = useDisclosure();
 
   const dispatch = useDispatch();
+  const history = useHistory();
+  const toast = useToast();
   const loggedUser = useSelector((st) => st.loggedUser);
 
   useEffect(() => {
     dispatch(usersActions.getUsers());
     dispatch(usersActions.getLoggedUser());
   }, []);
+
+  const logout = () => {
+    history.push("/");
+    localStorage.clear();
+    toast({
+      title: "Bye :)",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+      position: "top",
+    });
+  };
 
   return (
     <>
@@ -67,6 +83,19 @@ const ChatPage = () => {
           height={"75vh"}
           position="relative"
         >
+          <Button
+            position={"absolute"}
+            variant="outline"
+            colorScheme={"red"}
+            size="sm"
+            right="4"
+            top="4"
+            rounded="full"
+            onClick={logout}
+          >
+            Logout
+            <Icon marginLeft="2" as={IoExitOutline} />
+          </Button>
           <Grid templateColumns="repeat(4, 1fr)" height={"100%"}>
             <GridItem
               rounded="lg"
