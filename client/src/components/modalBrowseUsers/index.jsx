@@ -1,19 +1,12 @@
-import React from "react";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  Avatar,
-  Flex,
-  Box,
-  Text,
+  Avatar, Button, Flex, Modal, ModalBody,
+  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text
 } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
+
 const ModalBrowseUsers = ({ isOpen, onClose, onOpenInfoUser }) => {
+  const users = useSelector((st) => st.users);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -27,10 +20,15 @@ const ModalBrowseUsers = ({ isOpen, onClose, onOpenInfoUser }) => {
         <ModalHeader>Cari User</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map((el) => (
-            <Flex alignItems={"center"} gap="4" marginBottom={4}>
-              <Avatar name="YN" bg="cyan.500" color="white"></Avatar>
-              <Text>Username Here</Text>
+          {users.map((el, i) => (
+            <Flex alignItems={"center"} gap="4" marginBottom={4} key={i}>
+              <Avatar 
+                name="YN" 
+                bg="cyan.500" 
+                color="white"
+                src={el.avatar}
+                ></Avatar>
+              <Text>{el.username}</Text>
               <Button marginLeft={"auto"} size="xs" onClick={onOpenInfoUser}>
                 Lihat
               </Button>

@@ -7,6 +7,10 @@ import {
   InputRightElement, Text, useDisclosure
 } from "@chakra-ui/react";
 
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { userActions } from "../redux/action";
+
 // modals
 import ModalInfoUser from "../components/modalInfoUser";
 
@@ -36,6 +40,12 @@ const ChatPage = () => {
     onOpen: onOpenBrowseUsers,
     onClose: onCloseBrowseUsers,
   } = useDisclosure();
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(userActions.getUsers());
+  }, []);
 
   return (
     <>
