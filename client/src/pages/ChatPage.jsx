@@ -1,29 +1,107 @@
+import React, { useEffect, useState, useRef } from "react";
 import {
-  Avatar, Box, Button, Flex, Grid,
-  GridItem, Icon,
+  Box,
+  Grid,
+  GridItem,
+  Avatar,
+  Text,
+  Button,
+  AvatarBadge,
+  Flex,
+  Icon,
   Image,
   Input,
   InputGroup,
-  InputRightElement, Text, useDisclosure, useToast
+  InputRightElement,
+  useDisclosure,
+  useToast,
+  useMediaQuery,
 } from "@chakra-ui/react";
-
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { usersActions } from "../redux/action";
+import socket from "../services/socket";
 
 // modals
 import ModalInfoUser from "../components/modalInfoUser";
 
 // icons
+import camp404Logo from "../assets/camp404_logo.png";
 import { FiEdit, FiUser } from "react-icons/fi";
 import { HiPaperAirplane } from "react-icons/hi";
 import { IoExitOutline } from "react-icons/io5";
-import camp404Logo from "../assets/camp404_logo.png";
-import ModalBrowseUsers from "../components/modalBrowseUsers";
 import ModalEditUser from "../components/modalEditUser";
+import ModalBrowseUsers from "../components/modalBrowseUsers";
 
 const ChatPage = () => {
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const loggedUser = useSelector((st) => st.loggedUser);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chats, setChats] = useState([]);
+  let chatRef = useRef(null);
+  const toast = useToast();
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
+
+  useEffect(() => {
+    dispatch(usersActions.getUsers());
+    dispatch(usersActions.getLoggedUser());
+  }, []);
+
+  useEffect(() => {
+    socket.on("send chat", (payload) => {
+      if (payload.sender) {
+        setChats([...chats, senderChat(payload)]);
+      } else {
+        setChats([...chats, recieverChat(payload)]);
+      }
+      chatRef?.current?.scrollIntoView({ behavior: "smooth" });
+    });
+  }, [chats]);
+
+  const senderChat = (el) => {
+    return (
+      <Box
+        bg="cyan.500"
+        color="white"
+        rounded="lg"
+        width="75%"
+        marginLeft={"auto"}
+        marginBottom="2"
+        padding={"1"}
+        paddingRight="2"
+      >
+        <Flex alignItems={"center"} marginBottom="2">
+          <Text fontSize={"xs"} marginLeft="auto">
+            {el?.username}
+          </Text>
+          <Avatar name="saha we" size="xs" marginLeft={"2"} src={el?.avatar} />
+        </Flex>
+        <Text textAlign={"end"}>{el?.message}</Text>
+      </Box>
+    );
+  };
+
+  const recieverChat = (el) => {
+    return (
+      <Box
+        border="1px"
+        borderColor={"gray.300"}
+        rounded="lg"
+        width="75%"
+        marginBottom="2"
+        padding={"1"}
+        paddingLeft="2"
+      >
+        <Flex alignItems={"center"} marginBottom="2">
+          <Avatar name="saha we" size="xs" marginRight={"2"} src={el.avatar} />
+          <Text fontSize={"xs"}>{el.username}</Text>
+        </Flex>
+        <Text textAlign={"start"}>{el.message}</Text>
+      </Box>
+    );
+  };
+
   // state open & close untuk modal (lihat lebih lengkap di docs chakra ui)
   const {
     isOpen: isOpenInfoUser,
@@ -43,15 +121,17 @@ const ChatPage = () => {
     onClose: onCloseBrowseUsers,
   } = useDisclosure();
 
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const toast = useToast();
-  const loggedUser = useSelector((st) => st.loggedUser);
-
-  useEffect(() => {
-    dispatch(usersActions.getUsers());
-    dispatch(usersActions.getLoggedUser());
-  }, []);
+  const handleSendMessage = () => {
+    if (chatMessage) {
+      socket.emit("send chat", {
+        id: loggedUser._id,
+        avatar: loggedUser.avatar,
+        username: loggedUser.username,
+        message: chatMessage,
+      });
+      setChatMessage("");
+    }
+  };
 
   const logout = () => {
     history.push("/");
@@ -83,9 +163,37 @@ const ChatPage = () => {
           height={"75vh"}
           position="relative"
         >
+          <Avatar
+            hidden={!isMobile}
+            marginLeft={3}
+            name={loggedUser.username}
+            bg="cyan.500"
+            color="white"
+            size={"sm"}
+            onClick={onOpenEditUser}
+            src={loggedUser.avatar}
+            position={"absolute"}
+            left="4"
+            top="4"
+          ></Avatar>
+          <Button
+            hidden={!isMobile}
+            onClick={onOpenBrowseUsers}
+            bg="gray.50"
+            size="xs"
+            marginTop={4}
+            position={"absolute"}
+            rounded={"full"}
+            fontSize="10px"
+            left="2"
+            top="10"
+          >
+            <Icon as={FiUser} marginRight="2" />
+            Cari User
+          </Button>
           <Button
             position={"absolute"}
-            variant="outline"
+            variant="ghost"
             colorScheme={"red"}
             size="sm"
             right="4"
@@ -93,11 +201,12 @@ const ChatPage = () => {
             rounded="full"
             onClick={logout}
           >
-            Logout
+            <Text hidden={isMobile}>Keluar</Text>
             <Icon marginLeft="2" as={IoExitOutline} />
           </Button>
           <Grid templateColumns="repeat(4, 1fr)" height={"100%"}>
             <GridItem
+              hidden={isMobile}
               rounded="lg"
               display={"flex"}
               alignItems="center"
@@ -105,7 +214,7 @@ const ChatPage = () => {
               flexDirection="column"
               // borderRightWidth={1}
               bg="gray.100"
-              height="87%"
+              height="100%"
             >
               <Flex>
                 <Avatar
@@ -136,7 +245,7 @@ const ChatPage = () => {
                 Cari User
               </Button>
             </GridItem>
-            <GridItem colSpan={3}>
+            <GridItem colSpan={isMobile ? 4 : 3}>
               <Flex
                 alignItems={"center"}
                 justifyContent="center"
@@ -145,47 +254,29 @@ const ChatPage = () => {
               >
                 <Image src={camp404Logo} boxSize="12" alt="" />
               </Flex>
-              <Box padding="4" height={"70%"} overflowY="scroll">
-                {[0, 0, 0, 0, 0, 0].map((el) => (
-                  <Box
-                    border="1px"
-                    borderColor={"gray.300"}
-                    rounded="lg"
-                    width="75%"
-                    marginBottom="2"
-                    padding={"1"}
-                    paddingLeft="2"
-                  >
-                    <Flex alignItems={"center"} marginBottom="2">
-                      <Avatar name="saha we" size="xs" marginRight={"2"} />
-                      <Text fontSize={"xs"}>Name Here</Text>
-                    </Flex>
-                    <Text textAlign={"start"}>Hari ini ada kelas ?</Text>
-                  </Box>
-                ))}
-                <Box
-                  bg="cyan.500"
-                  color="white"
-                  rounded="lg"
-                  width="75%"
-                  marginLeft={"auto"}
-                  marginBottom="2"
-                  padding={"1"}
-                  paddingRight="2"
-                >
-                  <Flex alignItems={"center"} marginBottom="2">
-                    <Text fontSize={"xs"} marginLeft="auto">
-                      Your Name
-                    </Text>
-                    <Avatar name="saha we" size="xs" marginLeft={"2"} />
-                  </Flex>
-                  <Text textAlign={"end"}>Engga adaaa :/</Text>
-                </Box>
+              <Box padding="4" height={"57vh"} overflowY="scroll">
+                {[...chats]}
+                <div className="" ref={chatRef}></div>
               </Box>
               <InputGroup>
-                <Input marginLeft={2} />
+                <Input
+                  value={chatMessage}
+                  marginLeft={2}
+                  onChange={(ev) => setChatMessage(ev.target.value)}
+                  onKeyDown={(ev) => {
+                    if (ev.key === "Enter") {
+                      handleSendMessage();
+                    }
+                  }}
+                />
                 <InputRightElement
-                  children={<Icon as={HiPaperAirplane} color="cyan.500" />}
+                  children={
+                    <Icon
+                      as={HiPaperAirplane}
+                      color="cyan.500"
+                      onClick={handleSendMessage}
+                    />
+                  }
                 />
               </InputGroup>
             </GridItem>

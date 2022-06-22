@@ -25,6 +25,12 @@ const Login = () => {
 
   const toast = useToast();
 
+  const handleKeyPress = (ev) => {
+    if (ev.key === "Enter") {
+      handleLogin();
+    }
+  }
+
   const handleLogin = async () => {
     const body = {};
     body['email'] = inputState.email;
@@ -36,7 +42,7 @@ const Login = () => {
       toast({
         title: 'Welcome To Chat App.',
         status: 'success',
-        duration: 9000,
+        duration: 3000,
         isClosable: true,
         position: 'top',
       })
@@ -46,7 +52,7 @@ const Login = () => {
         title: 'Error occured.',
         description: response.data.message,
         status: 'error',
-        duration: 9000,
+        duration: 3000,
         isClosable: true,
         position: 'top',
       })
@@ -77,21 +83,22 @@ const Login = () => {
         <Text fontSize="2xl" fontWeight={"bold"} color="cyan.500">
           Login
         </Text>
-        <FormControl>
+        <FormControl onSubmit={handleKeyPress}>
           <FormLabel htmlFor="email">Email</FormLabel>
           <Input id="email" type="email" placeholder="Enter email" onChange={(event) => {
             setInputState({ ...inputState, email: event.target.value });
-          }} />
+          }} onKeyDown={handleKeyPress} />
 
           <FormLabel htmlFor="password" marginTop={2}>
             Password
           </FormLabel>
           <Input id="password" type="password" placeholder="Enter password" onChange={(event) => {
             setInputState({ ...inputState, password: event.target.value });
-          }} />
+          }} onKeyDown={handleKeyPress} />
 
           <Button
             onClick={handleLogin}
+            type="submit"
             colorScheme="cyan"
             color="white"
             width="100%"
